@@ -3,6 +3,7 @@ streamlit
 tenacity
 openai
 google-api-python-client
+langchain_google_genai
 pytube
 transformers
 python-dotenv
