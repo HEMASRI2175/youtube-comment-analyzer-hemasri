@@ -15,17 +15,7 @@ def add_custom_styles():
         .stApp {{
             font-family: Arial, sans-serif;
         }}
-        body, html {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-
-.container {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
+      
         .nav-links {
             display: flex;
             justify-content: space-evenly;
@@ -156,8 +146,8 @@ st.markdown(
     <div class="nav-links">
         <a href="#home">Home</a>
         <a href="#youtube">YouTube</a>
-        <a href="#about-us">About Us</a>
-        <a href="#contact-us">Contact Us</a>
+        <a href="#about-us">About</a>
+        <a href="#contact-us">Contact</a>
     </div>
     """,
     unsafe_allow_html=True,
