@@ -20,7 +20,7 @@ def add_custom_styles():
             display: flex;
             justify-content: space-evenly;
             align-items: center;
-            margin-top:35px;
+            margin-top:45px;
             padding: 15px 0;
             background: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
             position: fixed;
