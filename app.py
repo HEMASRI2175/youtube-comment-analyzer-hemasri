@@ -3,8 +3,6 @@ from comments import fetch_comments
 from utils import get_summary
 import base64
 
-import streamlit as st
-import base64
 
 # Set page configuration
 st.set_page_config(page_title="YouTube Comment Analyzer", layout="wide")
