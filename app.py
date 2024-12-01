@@ -169,7 +169,7 @@ def video_to_base64(video_path):
         return base64.b64encode(video_file.read()).decode()
 
 # Encode the video
-video_base64 = video_to_base64("static/bg.mp4")
+video_base64 = video_to_base64("bg.mp4")
 
 # Sections
 st.markdown('<a name="home"></a>', unsafe_allow_html=True)
@@ -342,9 +342,9 @@ def image_to_base64(image_path):
         return base64.b64encode(img_file.read()).decode()
 
 # Encode the image
-img_base64 = image_to_base64("static/image.png")
-img2_base64 = image_to_base64("static/image2.jpg")
-img3_base64 = image_to_base64("static/image3.png")
+img_base64 = image_to_base64("image.png")
+img2_base64 = image_to_base64("image2.jpg")
+img3_base64 = image_to_base64("image3.png")
 
 # Streamlit "About Us" Section
 with st.container():
