@@ -90,27 +90,53 @@ def add_custom_styles():
             margin: 40px 0;
         }
 
-        .card {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            width: 30%;
-            text-align: center;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
+       /* Container for the about cards */
+.about-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+    padding: 20px;
+}
 
-        .card img {
-            width: 100%;
-            border-radius: 10px;
-        }
+/* Styling for individual cards */
+.about-card {
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 300px;  /* Default width */
+    transition: transform 0.3s ease-in-out;
+}
 
-        .card h3 {
-            margin: 15px 0;
-        }
+/* Hover effect for cards */
+.about-card:hover {
+    transform: translateY(-10px);
+}
 
-        .card p {
-            color: #555;
-        }
+/* Responsive Design */
+@media screen and (max-width: 1200px) {
+    .about-card {
+        width: 45%; /* 2 cards per row on medium screens */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .about-card {
+        width: 100%; /* Full width for small screens */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .about-cards-container {
+        flex-direction: column; /* Stack cards vertically on very small screens */
+        align-items: center;
+    }
+    .about-card {
+        width: 90%; /* Make cards take up most of the width on smaller screens */
+    }
+}
+
 
         /* Contact form */
         .contact-form {
