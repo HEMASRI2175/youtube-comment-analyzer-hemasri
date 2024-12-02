@@ -7,6 +7,7 @@ langchain>=0.1.0
 langchain-google-genai  # For ChatGoogleGenerativeAI (assuming you are using this library for Google Generative AI integration)
 langchain-text-splitters  # For TokenTextSplitter
 tiktoken
+tweepy
 pytube>=12.1.0
 transformers>=4.32.0
 python-dotenv>=1.0.0
