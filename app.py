@@ -153,7 +153,7 @@ def video_to_base64(video_path):
         return base64.b64encode(video_file.read()).decode()
 
 # Encode the video
-video_base64 = video_to_base64("static/bg.mp4")
+video_base64 = video_to_base64("bg.mp4")
 
 # Sections
 st.markdown('<a name="home"></a>', unsafe_allow_html=True)
