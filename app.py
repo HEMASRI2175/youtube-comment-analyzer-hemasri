@@ -1,7 +1,19 @@
 import streamlit as st
 from comments import fetch_comments
+from twitter_comments import (
+    initialize_twitter_client_v2,
+    extract_tweet_id_from_url,
+    fetch_tweet_replies,
+    load_replies_in_format,
+    summarize_replies,
+    categorize_replies
+)
 from utils import get_summary
 import base64
+from transformers import pipeline
+import re
+import tweepy
+
 
 
 # Set page configuration
@@ -15,7 +27,17 @@ def add_custom_styles():
         .stApp {{
             font-family: Arial, sans-serif;
         }}
-      
+        body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.container {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
         .nav-links {
             display: flex;
             justify-content: space-evenly;
@@ -73,70 +95,16 @@ def add_custom_styles():
         }
 
         .content h1 {
-            font-size: 2.5rem; /* Adjust size of the heading */
+            font-size: 6rem; /* Adjust size of the heading */
             color: white;
         }
 
         .content p {
-            font-size: 2rem; /* Adjust size of the heading */
+            font-size: 3rem; /* Adjust size of the heading */
             color: white;
         }
 
-        /* About Us cards */
-        .cards-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 40px 0;
-        }
-
-       /* Container for the about cards */
-.about-cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    gap: 20px;
-    padding: 20px;
-}
-
-/* Styling for individual cards */
-.about-card {
-    background-color: #f4f4f4;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    width: 300px;  /* Default width */
-    transition: transform 0.3s ease-in-out;
-}
-
-/* Hover effect for cards */
-.about-card:hover {
-    transform: translateY(-10px);
-}
-
-/* Responsive Design */
-@media screen and (max-width: 1200px) {
-    .about-card {
-        width: 45%; /* 2 cards per row on medium screens */
-    }
-}
-
-@media screen and (max-width: 768px) {
-    .about-card {
-        width: 100%; /* Full width for small screens */
-    }
-}
-
-@media screen and (max-width: 480px) {
-    .about-cards-container {
-        flex-direction: column; /* Stack cards vertically on very small screens */
-        align-items: center;
-    }
-    .about-card {
-        width: 90%; /* Make cards take up most of the width on smaller screens */
-    }
-}
-
+        
 
         /* Contact form */
         .contact-form {
@@ -171,7 +139,7 @@ st.markdown(
     """
     <div class="nav-links">
         <a href="#home">Home</a>
-        <a href="#youtube">YouTube</a>
+        <a href="#youtube">Comments</a>
         <a href="#about-us">About</a>
         <a href="#contact-us">Contact</a>
     </div>
@@ -185,7 +153,7 @@ def video_to_base64(video_path):
         return base64.b64encode(video_file.read()).decode()
 
 # Encode the video
-video_base64 = video_to_base64("bg.mp4")
+video_base64 = video_to_base64("static/bg.mp4")
 
 # Sections
 st.markdown('<a name="home"></a>', unsafe_allow_html=True)
@@ -198,8 +166,8 @@ with st.container():
                 Your browser does not support the video tag.
             </video>
             <div class="content">
-                <h1>YouTube Comment Analyzer</h1>
-                <p>Analyze and summarize YouTube comments efficiently.</p>
+                <h1>ComSense</h1>
+                <p>Transforming Comments into Clarity, Empowering Insights for Smarter Decisions.</p>
             </div>
         </div>
         """,
@@ -303,9 +271,63 @@ with right:
     else:
         st.info("Submit a YouTube URL to display the summary.")
     st.markdown("</div>", unsafe_allow_html=True)
+    # Divider
+st.markdown("<hr>", unsafe_allow_html=True)
+# Twitter API credentials
+api_key = st.secrets["TWITTER_API_KEY"]
+api_key_secret = st.secrets["TWITTER_API_KEY_SECRET"]
+access_token = st.secrets["TWITTER_ACCESS_TOKEN"]
+access_token_secret = st.secrets["TWITTER_ACCESS_TOKEN_SECRET"]
+bearer_token = st.secrets["TWITTER_BEARER_TOKEN"]
 
+# Initialize Twitter API client
+def initialize_twitter_api():
+    client = tweepy.Client(
+        bearer_token=bearer_token,
+        consumer_key=api_key,
+        consumer_secret=api_key_secret,
+        access_token=access_token,
+        access_token_secret=access_token_secret,
+    )
+    return client
+st.title("Twitter Comments Analyzer")
+st.write(
+    "Use this tool to fetch and summarize comments under a specific tweet. "
+    "Provide a tweet URL to begin."
+)
 
-# Streamlit "About Us" Section
+# Input Section
+tweet_url = st.text_input(
+    "Enter Tweet URL",
+    placeholder="Paste the tweet URL here...",
+    value=""
+)
+max_results = st.slider("Number of Comments to fetch", 1, 100, 10)
+
+if st.button("Get Comments Summary"):
+    if tweet_url:
+        with st.spinner("Fetching comments and summarizing..."):
+            # Extract Tweet ID
+            tweet_id = extract_tweet_id_from_url(tweet_url)
+            if tweet_id:
+                # Initialize Twitter client and fetch comments
+                client = initialize_twitter_client_v2()
+                comments = fetch_tweet_replies(client, tweet_id, max_replies=max_results)
+                if comments:
+                    # Aggregate and summarize replies
+                    formatted_replies = load_replies_in_format(comments)
+                    summary = summarize_replies(comments)
+                    
+                    
+                    st.write("### Summary of Comments")
+                    if summary:
+                        st.write(summary)
+                else:
+                    st.error("No comments found or an error occurred.")
+            else:
+                st.error("Invalid tweet URL. Please check and try again.")
+    else:
+        st.error("Please enter a tweet URL.")
 st.markdown('<a name="about-us"></a>', unsafe_allow_html=True)
 with st.container():
     st.header("About Us")
@@ -314,37 +336,53 @@ with st.container():
     st.markdown(
         """
         <style>
-            .cards-container {
-                display: flex;
-                justify-content: space-between;
-                flex-wrap: wrap;
-                margin-top: 20px;
-                gap: 20px;
-            }
-            .card {
-                background: #ffffff;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                border-radius: 10px;
-                width: 30%;
-                text-align: center;
-                padding: 15px;
-                box-sizing: border-box;
-            }
-            .card img {
-                width: 100%;
-                height: auto;
-                border-radius: 10px 10px 0 0;
-            }
-            .card h3 {
-                font-size: 20px;
-                color: #333;
-                margin: 15px 0 10px;
-            }
-            .card p {
-                font-size: 14px;
-                color: #666;
-                line-height: 1.5;
-            }
+           /* Container for the about cards */
+.about-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Styling for individual cards */
+.about-card {
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 300px;  /* Default width (for larger screens) */
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Hover effect for cards */
+.about-card:hover {
+    transform: translateY(-10px);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1200px) {
+    .about-card {
+        width: 45%; /* 2 cards per row on medium screens */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .about-card {
+        width: 100%; /* 1 card per row on smaller screens */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .about-cards-container {
+        flex-direction: column; /* Stack cards vertically on very small screens */
+        align-items: center;
+    }
+    .about-card {
+        width: 90%; /* Cards take up most of the width on small screens */
+    }
+}
+
         </style>
         """,
         unsafe_allow_html=True,
@@ -358,9 +396,9 @@ def image_to_base64(image_path):
         return base64.b64encode(img_file.read()).decode()
 
 # Encode the image
-img_base64 = image_to_base64("image.png")
-img2_base64 = image_to_base64("image2.jpg")
-img3_base64 = image_to_base64("image3.png")
+img_base64 = image_to_base64("static/image.png")
+img2_base64 = image_to_base64("static/image2.jpg")
+img3_base64 = image_to_base64("static/image3.png")
 
 # Streamlit "About Us" Section
 with st.container():
@@ -407,17 +445,17 @@ with st.container():
             <div class="card">
                 <img src="data:image/png;base64,{img_base64}" alt="Feature 1">
                 <h3>Efficient Data Analysis</h3>
-                <p>Our app excels at analyzing YouTube comments to extract valuable insights. Using advanced natural language processing and sentiment analysis, it identifies key trends, opinions, and sentiments in user comments, helping users gain meaningful feedback and make informed decisions effortlessly.</p>
+                <p>ComSense excels at analyzing comments from platforms like YouTube and Twitter to extract valuable insights. Using advanced natural language processing and sentiment analysis, it identifies key trends, opinions, and sentiments in user comments. Whether it's feedback on a video or a tweet, ComSense helps you gain meaningful insights and make informed decisions effortlessly.</p>
             </div>
             <div class="card">
                 <img src="data:image/jpeg;base64,{img2_base64}" alt="Feature 2">
                 <h3>User-Friendly Design</h3>
-                <p>Our app offers a user-friendly interface, designed to be intuitive and accessible for everyone, whether you're a beginner or an expert, ensuring a smooth and efficient experience</p>
+                <p>ComSense offers a user-friendly interface designed for everyone, from beginners to experts. Its intuitive layout ensures a smooth and efficient experience, making comment analysis accessible and straightforward for all users</p>
             </div>
             <div class="card">
                 <img src="data:image/png;base64,{img3_base64}" alt="Feature 3">
                 <h3>AI-Powered Summaries</h3>
-                <p>Leverage cutting-edge AI algorithms to generate precise summaries.Our app intelligently condenses lengthy content into clear and digestible insights.Get concise, meaningful information in seconds, saving you time and effort.</p>
+                <p>Leverage the power of cutting-edge AI with ComSense. It intelligently condenses lengthy comment threads into clear and concise insights. Whether you're analyzing opinions from tweets or video comments, ComSense provides meaningful summaries in seconds, saving you time and effort.</p>
             </div>
         </div>
         """,
