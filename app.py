@@ -396,9 +396,9 @@ def image_to_base64(image_path):
         return base64.b64encode(img_file.read()).decode()
 
 # Encode the image
-img_base64 = image_to_base64("static/image.png")
-img2_base64 = image_to_base64("static/image2.jpg")
-img3_base64 = image_to_base64("static/image3.png")
+img_base64 = image_to_base64("image.png")
+img2_base64 = image_to_base64("image2.jpg")
+img3_base64 = image_to_base64("image3.png")
 
 # Streamlit "About Us" Section
 with st.container():
