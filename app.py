@@ -328,65 +328,6 @@ if st.button("Get Comments Summary"):
                 st.error("Invalid tweet URL. Please check and try again.")
     else:
         st.error("Please enter a tweet URL.")
-st.markdown('<a name="about-us"></a>', unsafe_allow_html=True)
-with st.container():
-    st.header("About Us")
-
-    # Add CSS for styling
-    st.markdown(
-        """
-        <style>
-           /* Container for the about cards */
-.about-cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 20px;
-}
-
-/* Styling for individual cards */
-.about-card {
-    background-color: #f4f4f4;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    width: 300px;  /* Default width (for larger screens) */
-    transition: transform 0.3s ease-in-out;
-}
-
-/* Hover effect for cards */
-.about-card:hover {
-    transform: translateY(-10px);
-}
-
-/* Responsive Design */
-@media screen and (max-width: 1200px) {
-    .about-card {
-        width: 45%; /* 2 cards per row on medium screens */
-    }
-}
-
-@media screen and (max-width: 768px) {
-    .about-card {
-        width: 100%; /* 1 card per row on smaller screens */
-    }
-}
-
-@media screen and (max-width: 480px) {
-    .about-cards-container {
-        flex-direction: column; /* Stack cards vertically on very small screens */
-        align-items: center;
-    }
-    .about-card {
-        width: 90%; /* Cards take up most of the width on small screens */
-    }
-}
-
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
 import base64
 import streamlit as st
 
@@ -395,79 +336,102 @@ def image_to_base64(image_path):
     with open(image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode()
 
-# Encode the image
+# Encode images
 img_base64 = image_to_base64("image.png")
 img2_base64 = image_to_base64("image2.jpg")
 img3_base64 = image_to_base64("image3.png")
 
 # Streamlit "About Us" Section
+st.markdown('<a name="about-us"></a>', unsafe_allow_html=True)
 with st.container():
-    st.markdown('<a name="about-us"></a>', unsafe_allow_html=True)
+    st.header("About Us")
 
-    # Add CSS for styling
-   st.markdown(
-    f"""
-    <style>
-        .cards-container {{
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap; /* Allow wrapping */
-            gap: 20px;
-            width: 100%; /* Ensure full width */
-            margin-top: 20px;
-        }}
-        .card {{
-            background: #000000; /* Black background */
-            border: 1px solid #ffffff; /* Thin white border */
-            border-radius: 10px;
-            width: 100%; /* Default width for mobile */
-            text-align: center;
-            padding: 15px;
-            box-sizing: border-box;
-        }}
-        .card img {{
-            width: 100%;
-            height: auto;
-            border-radius: 10px 10px 0 0;
-        }}
-        .card h3 {{
-            font-size: 20px;
-            color: #ffffff; /* White text for contrast */
-            margin: 15px 0 10px;
-        }}
-        .card p {{
-            font-size: 14px;
-            color: #cccccc; /* Light grey for description */
-            line-height: 1.5;
-        }}
-        
-        /* Media query for larger screens (e.g., laptops) */
-        @media (min-width: 1024px) {{
-            .card {{
-                width: 30%; /* Adjust width for three columns */
+    # Add CSS for styling and responsiveness
+    st.markdown(
+        f"""
+        <style>
+            /* Container for the cards */
+            .cards-container {{
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                gap: 20px;
+                margin-top: 20px;
+                padding: 10px;
             }}
-        }}
-    </style>
-    <div class="cards-container">
-        <div class="card">
-            <img src="data:image/png;base64,{img_base64}" alt="Feature 1">
-            <h3>Efficient Data Analysis</h3>
-            <p>ComSense excels at analyzing comments from platforms like YouTube and Twitter to extract valuable insights. Using advanced natural language processing and sentiment analysis, it identifies key trends, opinions, and sentiments in user comments. Whether it's feedback on a video or a tweet, ComSense helps you gain meaningful insights and make informed decisions effortlessly.</p>
+
+            /* Styling for individual cards */
+            .card {{
+                background-color: #000000; /* Black background */
+                border: 1px solid #ffffff; /* Thin white border */
+                border-radius: 10px;
+                width: 100%; /* Default width for smaller screens */
+                text-align: center;
+                padding: 20px;
+                box-sizing: border-box;
+                transition: transform 0.3s ease-in-out;
+            }}
+
+            /* Hover effect for cards */
+            .card:hover {{
+                transform: translateY(-10px);
+            }}
+
+            /* Styling for card images */
+            .card img {{
+                width: 100%;
+                height: auto;
+                border-radius: 10px 10px 0 0;
+            }}
+
+            /* Styling for card headings */
+            .card h3 {{
+                font-size: 20px;
+                color: #ffffff; /* White text for contrast */
+                margin: 15px 0 10px;
+            }}
+
+            /* Styling for card paragraphs */
+            .card p {{
+                font-size: 14px;
+                color: #cccccc; /* Light grey for description */
+                line-height: 1.5;
+            }}
+
+            /* Responsive Design */
+            @media (min-width: 768px) {{
+                .card {{
+                    width: 45%; /* 2 cards per row on medium screens */
+                }}
+            }}
+
+            @media (min-width: 1024px) {{
+                .card {{
+                    width: 30%; /* 3 cards per row on larger screens */
+                }}
+            }}
+        </style>
+
+        <div class="cards-container">
+            <div class="card">
+                <img src="data:image/png;base64,{img_base64}" alt="Feature 1">
+                <h3>Efficient Data Analysis</h3>
+                <p>ComSense excels at analyzing comments from platforms like YouTube and Twitter to extract valuable insights. Using advanced natural language processing and sentiment analysis, it identifies key trends, opinions, and sentiments in user comments. Whether it's feedback on a video or a tweet, ComSense helps you gain meaningful insights and make informed decisions effortlessly.</p>
+            </div>
+            <div class="card">
+                <img src="data:image/jpeg;base64,{img2_base64}" alt="Feature 2">
+                <h3>User-Friendly Design</h3>
+                <p>ComSense offers a user-friendly interface designed for everyone, from beginners to experts. Its intuitive layout ensures a smooth and efficient experience, making comment analysis accessible and straightforward for all users.</p>
+            </div>
+            <div class="card">
+                <img src="data:image/png;base64,{img3_base64}" alt="Feature 3">
+                <h3>AI-Powered Summaries</h3>
+                <p>Leverage the power of cutting-edge AI with ComSense. It intelligently condenses lengthy comment threads into clear and concise insights. Whether you're analyzing opinions from tweets or video comments, ComSense provides meaningful summaries in seconds, saving you time and effort.</p>
+            </div>
         </div>
-        <div class="card">
-            <img src="data:image/jpeg;base64,{img2_base64}" alt="Feature 2">
-            <h3>User-Friendly Design</h3>
-            <p>ComSense offers a user-friendly interface designed for everyone, from beginners to experts. Its intuitive layout ensures a smooth and efficient experience, making comment analysis accessible and straightforward for all users</p>
-        </div>
-        <div class="card">
-            <img src="data:image/png;base64,{img3_base64}" alt="Feature 3">
-            <h3>AI-Powered Summaries</h3>
-            <p>Leverage the power of cutting-edge AI with ComSense. It intelligently condenses lengthy comment threads into clear and concise insights. Whether you're analyzing opinions from tweets or video comments, ComSense provides meaningful summaries in seconds, saving you time and effort.</p>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 st.markdown('<a name="contact-us"></a>', unsafe_allow_html=True)
