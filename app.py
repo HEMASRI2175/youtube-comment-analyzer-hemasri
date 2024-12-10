@@ -9,10 +9,10 @@ from twitter_comments import (
     categorize_replies
 )
 from facebook_comments import (
-    fetch_comments,           # To fetch and format all comments for a given post ID
-    start_facebook_service,   # Initializes the base URL for Facebook Graph API
-    get_post_comments,        # Fetches comments for a specific post
-    load_comments_in_format   # Formats comments for display
+    fetch_comments,           
+    start_facebook_service,   
+    get_post_comments,       
+    load_comments_in_format  
 )
 from utils import get_summary
 import base64
