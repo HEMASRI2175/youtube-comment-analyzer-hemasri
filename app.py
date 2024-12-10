@@ -8,6 +8,12 @@ from twitter_comments import (
     summarize_replies,
     categorize_replies
 )
+from facebook_comments import (
+    fetch_comments,           # To fetch and format all comments for a given post ID
+    start_facebook_service,   # Initializes the base URL for Facebook Graph API
+    get_post_comments,        # Fetches comments for a specific post
+    load_comments_in_format   # Formats comments for display
+)
 from utils import get_summary
 import base64
 from transformers import pipeline
@@ -173,10 +179,6 @@ with st.container():
         """,
         unsafe_allow_html=True,
     )
-
-
-
-
 # Custom CSS for styling
 st.markdown(
     """
@@ -224,6 +226,99 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+# Page styling for 100% height and width
+st.markdown(
+    """
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #121212;
+        }
+        .styled-button {
+            background-color: #1e1e1e; /* Dark background */
+            color: white !important; /* White text color */
+            padding: 10px 20px; /* Padding around the text */
+            text-align: center; /* Center the text */
+            display: inline-block; /* Inline display */
+            font-size: 16px; /* Font size */
+            margin: 10px; /* Margin around the button */
+            border: 1px solid white; /* Thin white border */
+            border-radius: 8px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor on hover */
+            text-decoration: none !important; /* Remove underline from link */
+            transition: background-color 0.3s, transform 0.2s; /* Smooth transition for background color and scale */
+        }
+
+        .styled-button:hover {
+            background-color: #333; /* Darker shade on hover */
+            transform: scale(1.05); /* Slight scale effect on hover */
+        }
+
+        h1, p {
+            color: white; /* White text for heading and paragraph */
+        }
+
+        h1 {
+            font-size: 40px; /* Big heading */
+            margin-bottom: 20px; /* Space below the heading */
+        }
+
+        p {
+            font-size: 20px; /* Paragraph size */
+            margin-bottom: 40px; /* Space below the paragraph */
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Anchor link for the comments section
+st.markdown('<a name="comments"></a>', unsafe_allow_html=True)
+
+# Heading and paragraph
+st.markdown(
+    """
+    <h1 style='text-align: center;'>Comments Analysis</h1>
+    <p style='text-align: center;'>Select a platform to view and analyze comments.</p>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Buttons to navigate to social media comment analysis pages
+col1, col2, col3, col4 = st.columns(4)
+
+# Use the styled button for YouTube
+with col1:
+    st.markdown('<a href="#youtube" class="styled-button">YouTube</a>', unsafe_allow_html=True)
+
+# Use the styled button for Twitter
+with col2:
+    st.markdown('<a href="#twitter" class="styled-button">Twitter</a>', unsafe_allow_html=True)
+
+# Use the styled button for Facebook
+with col3:
+    st.markdown('<a href="#facebook" class="styled-button">Facebook</a>', unsafe_allow_html=True)
+
+# Use the styled button for Instagram
+with col4:
+    st.markdown('<a href="#instagram" class="styled-button">Instagram</a>', unsafe_allow_html=True)
+
+
 st.markdown('<a name="youtube"></a>', unsafe_allow_html=True)
 # Header and Instructions
 st.title("YouTube Comment Analyzer")
@@ -271,8 +366,8 @@ with right:
     else:
         st.info("Submit a YouTube URL to display the summary.")
     st.markdown("</div>", unsafe_allow_html=True)
-    # Divider
-st.markdown("<hr>", unsafe_allow_html=True)
+
+st.markdown('<a name="twitter"></a>', unsafe_allow_html=True)
 # Twitter API credentials
 api_key = st.secrets["TWITTER_API_KEY"]
 api_key_secret = st.secrets["TWITTER_API_KEY_SECRET"]
@@ -290,34 +385,48 @@ def initialize_twitter_api():
         access_token_secret=access_token_secret,
     )
     return client
+
+# Main UI for Twitter
 st.title("Twitter Comments Analyzer")
 st.write(
     "Use this tool to fetch and summarize comments under a specific tweet. "
     "Provide a tweet URL to begin."
 )
 
-# Input Section
-tweet_url = st.text_input(
-    "Enter Tweet URL",
-    placeholder="Paste the tweet URL here...",
-    value=""
-)
-max_results = st.slider("Number of Comments to fetch", 1, 100, 10)
+# Create two columns for the layout
+left, right = st.columns(2)
 
-if st.button("Get Comments Summary"):
-    if tweet_url:
+# Left Section - Input Form
+with left:
+    st.markdown("<div class='left-section'>", unsafe_allow_html=True)
+    st.header("Input Section")
+    # Wrap input fields in a form for Twitter
+    with st.form("twitter_form"):
+        tweet_url = st.text_input(
+            "Enter Tweet URL",
+            placeholder="Paste the tweet URL here...",
+            value=""
+        )
+        max_results = st.slider("Number of Comments to fetch", 1, 100, 10)
+        submit_tweet = st.form_submit_button("Get Summary")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# Right Section - Output for Twitter
+with right:
+    st.markdown("<div class='right-section'>", unsafe_allow_html=True)
+    st.header("Summary Section")
+    if submit_tweet and tweet_url:
         with st.spinner("Fetching comments and summarizing..."):
             # Extract Tweet ID
             tweet_id = extract_tweet_id_from_url(tweet_url)
             if tweet_id:
                 # Initialize Twitter client and fetch comments
-                client = initialize_twitter_client_v2()
+                client = initialize_twitter_api()
                 comments = fetch_tweet_replies(client, tweet_id, max_replies=max_results)
                 if comments:
                     # Aggregate and summarize replies
                     formatted_replies = load_replies_in_format(comments)
                     summary = summarize_replies(comments)
-                    
                     
                     st.write("### Summary of Comments")
                     if summary:
@@ -327,7 +436,78 @@ if st.button("Get Comments Summary"):
             else:
                 st.error("Invalid tweet URL. Please check and try again.")
     else:
-        st.error("Please enter a tweet URL.")
+        st.info("Submit a Twitter URL to display the summary.")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+st.markdown('<a name="facebook"></a>', unsafe_allow_html=True)
+
+
+# Header and Instructions
+st.title("Facebook Comment Analyzer")
+st.write(
+    "Analyze comments on Facebook posts with ease! "
+    "Provide a Facebook Post URL, and this tool will fetch the comments for analysis."
+)
+
+# Main container with two sections
+left, right = st.columns(2)
+
+# Left Section - Input Form
+with left:
+    st.markdown("<div class='left-section'>", unsafe_allow_html=True)
+    st.header("Input Section")
+    form = st.form("facebook_form")
+    post_url_input = form.text_input(
+        "Enter Facebook Post URL",
+        placeholder="Paste your Facebook post link here...",
+        value="",
+    )
+    submit = form.form_submit_button("Fetch Comments")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# Placeholder for Right Section - Output
+with right:
+    st.markdown("<div class='right-section'>", unsafe_allow_html=True)
+    st.header("Comments Analysis")
+    if submit and post_url_input:
+        with st.spinner("Fetching comments..."):
+            # Fetch comments from Facebook API
+            comments = fetch_facebook_comments(post_url_input)  # Replace with your function
+            
+            if comments:  # Proceed only if comments are fetched
+                # Display the fetched comments
+                st.subheader("Fetched Comments")
+                st.text_area("Comments", value="\n".join(comments), height=200)
+
+                # Summarize comments (optional)
+                st.subheader("Summary")
+                summary = get_summary(comments)  # Replace with your summarization function
+                st.markdown(
+                    f"<p style='font-size:18px; line-height:1.6;'>{summary}</p>",
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.error("Unable to fetch comments. Please check the post URL or try again.")
+    else:
+        st.info("Submit a Facebook Post URL to analyze the comments.")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+# Instagram Comments Section (This is just a placeholder for now)
+st.markdown('<a name="instagram"></a>', unsafe_allow_html=True)
+st.markdown(
+    """
+    <h3>Instagram Comments Analysis</h3>
+    <p>Here you can analyze comments from Instagram posts. Input an Instagram post URL to fetch and analyze comments.</p>
+    """,
+    unsafe_allow_html=True,
+)
+st.markdown('<a name="about-us"></a>', unsafe_allow_html=True)
+
+
+
+
+
 import base64
 import streamlit as st
 
