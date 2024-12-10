@@ -95,7 +95,7 @@ def add_custom_styles():
         }
 
         .content h1 {
-            font-size: 3rem; /* Adjust size of the heading */
+            font-size: 2.8rem; /* Adjust size of the heading */
             color: white;
         }
 
