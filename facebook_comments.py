@@ -4,9 +4,9 @@ import streamlit as st
 
 # Load environment variables
 load_dotenv()
+facebook_access_token = st.secrets["FACEBOOK_ACCESS_TOKEN"]
 
 facebook_api_version = st.secrets["FACEBOOK_API_VERSION"]
-facebook_access_token = st.secrets["FACEBOOK_ACCESS_TOKEN"]
 
 def start_facebook_service():
     """
