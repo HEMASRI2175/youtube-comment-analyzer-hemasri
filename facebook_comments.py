@@ -1,6 +1,8 @@
 import requests
 from dotenv import load_dotenv
 import streamlit as st
+import re
+
 
 # Load environment variables
 load_dotenv()
