@@ -4,7 +4,6 @@ import streamlit as st
 
 # Load environment variables
 load_dotenv()
-
 acebook_api_version = "v21.0"  
 facebook_access_token = "EAAP2jbgg3VIBOzaOsZCbFZACZA7vwhruVVAYzre10y0BU1vuIHd13lzuuTKFDFJqs3DLnSz0ZAjuyNyC0jEaIaSOgClgo9J3DRTjZCiGEvDhHcgaZC44k5O3Vuw1BRskZBlyJaEWMD5de1ErJEw99zTsSrseb2B1ZAN9UqtJAdCOZCKxdIp2Bc9T7zslWshjTaihZAbzSIlpnnS56Hklyqk7zgwHHle53qSoonYGgZD"
 def start_facebook_service():
