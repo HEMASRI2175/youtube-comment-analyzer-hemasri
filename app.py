@@ -95,12 +95,12 @@ def add_custom_styles():
         }
 
         .content h1 {
-            font-size: 6rem; /* Adjust size of the heading */
+            font-size: 3rem; /* Adjust size of the heading */
             color: white;
         }
 
         .content p {
-            font-size: 3rem; /* Adjust size of the heading */
+            font-size: 1rem; /* Adjust size of the heading */
             color: white;
         }
 
