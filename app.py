@@ -16,7 +16,6 @@ import tweepy
 
 
 
-
 # Set page configuration
 st.set_page_config(page_title="YouTube Comment Analyzer", layout="wide")
 
@@ -329,7 +328,67 @@ if st.button("Get Comments Summary"):
                 st.error("Invalid tweet URL. Please check and try again.")
     else:
         st.error("Please enter a tweet URL.")
+st.markdown('<a name="about-us"></a>', unsafe_allow_html=True)
+with st.container():
+    st.header("About Us")
 
+    # Add CSS for styling
+    st.markdown(
+        """
+        <style>
+           /* Container for the about cards */
+.about-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Styling for individual cards */
+.about-card {
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 300px;  /* Default width (for larger screens) */
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Hover effect for cards */
+.about-card:hover {
+    transform: translateY(-10px);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1200px) {
+    .about-card {
+        width: 45%; /* 2 cards per row on medium screens */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .about-card {
+        width: 100%; /* 1 card per row on smaller screens */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .about-cards-container {
+        flex-direction: column; /* Stack cards vertically on very small screens */
+        align-items: center;
+    }
+    .about-card {
+        width: 90%; /* Cards take up most of the width on small screens */
+    }
+}
+
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+import base64
+import streamlit as st
 
 # Function to encode image to Base64
 def image_to_base64(image_path):
