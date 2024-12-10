@@ -9,7 +9,7 @@ from twitter_comments import (
     categorize_replies
 )
 from facebook_comments import (
-    fetch_comments,           
+    fetch_fb_comments,           
     start_facebook_service,   
     get_post_comments,       
     load_comments_in_format  
